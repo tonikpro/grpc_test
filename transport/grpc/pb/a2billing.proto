@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package transport;
+
+option go_package = ".;pb";
+
+service A2billing {
+    rpc GetAgentIdsByParentAgentID (GetAgentIdsByParentAgentIDRequest) returns (GetAgentIdsByParentAgentIDResponse);
+}
+
+message GetAgentIdsByParentAgentIDRequest {
+    int32 agent_id = 1;
+}
+
+message GetAgentIdsByParentAgentIDResponse {
+    repeated int32 agent_ids = 1;
+}

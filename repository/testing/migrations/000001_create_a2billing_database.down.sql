@@ -1,0 +1,1 @@
+DROP DATABASE a2billing;
