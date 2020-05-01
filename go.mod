@@ -8,6 +8,7 @@ require (
 	github.com/go-kit/kit v0.10.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang-migrate/migrate/v4 v4.10.0
+	github.com/golang/mock v1.4.3
 	github.com/golang/protobuf v1.4.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/opencontainers/runc v0.1.1 // indirect
