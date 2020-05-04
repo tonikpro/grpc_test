@@ -18,7 +18,7 @@ func (s GrpcServer) GetAgentIdsByParentAgentID(ctx context.Context, request *pb.
 	if err != nil {
 		return
 	}
-	response.AgentIds = r.([]int32)
+	response = &pb.GetAgentIdsByParentAgentIDResponse{AgentIds: r.([]int32)}
 	return
 }
 

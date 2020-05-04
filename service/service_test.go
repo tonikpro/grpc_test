@@ -6,13 +6,13 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/tonikpro/grpc_test/service/mock"
+	"github.com/tonikpro/grpc_test/test/mocks/repository"
 )
 
 func Test_a2billing_GetAgentIdsByParentAgentID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	m := mock.NewMockA2billingRepository(ctrl)
+	m := repository.NewMockA2billingRepository(ctrl)
 	m.EXPECT().GetAgentIdsByParentAgentID(int32(1)).Return([]int32{2, 3, 4}, nil)
 	m.EXPECT().GetAgentIdsByParentAgentID(int32(5)).Return([]int32{6, 7}, nil)
 	m.EXPECT().GetAgentIdsByParentAgentID(int32(6)).Return([]int32{}, nil)

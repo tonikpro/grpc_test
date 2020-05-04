@@ -9,68 +9,27 @@ import (
 	"testing"
 
 	driverSql "github.com/go-sql-driver/mysql"
-	"github.com/golang-migrate/migrate/v4"
-	_mysql "github.com/golang-migrate/migrate/v4/database/mysql"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/dockertest"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"github.com/tonikpro/grpc_test/repository/testing/models"
+	"github.com/tonikpro/grpc_test/test"
+	"github.com/tonikpro/grpc_test/test/models"
 )
 
 var db *sqlx.DB
 
-type migration struct {
-	Migrate *migrate.Migrate
-}
-
-func (m migration) Up() (bool, error) {
-	err := m.Migrate.Up()
-	if err != nil {
-		if err == migrate.ErrNoChange {
-			return true, nil
-		}
-		return false, err
-	}
-	return true, nil
-}
-
-func (m migration) Down() (bool, error) {
-	err := m.Migrate.Down()
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
-func newMigration(dbConn *sqlx.DB, migrationsFolderLocation string) (*migration, error) {
-	pathToMigrate := fmt.Sprintf("file://%s", migrationsFolderLocation)
-
-	driver, err := _mysql.WithInstance(dbConn.DB, &_mysql.Config{})
-	if err != nil {
-		return nil, err
-	}
-
-	m, err := migrate.NewWithDatabaseInstance(pathToMigrate, "mysql", driver)
-	fmt.Println(err)
-	if err != nil {
-		return nil, err
-	}
-	return &migration{Migrate: m}, nil
-}
-
 type mysqlSuite struct {
 	suite.Suite
 	DB        *sqlx.DB
-	Migration *migration
+	Migration *test.Migration
 }
 
 func (s *mysqlSuite) SetupSuite() {
 	log.Println("Starting a Test. Migrating the Database")
 	DisableLogging()
 	var err error
-	s.Migration, err = newMigration(s.DB, "testing/migrations")
+	s.Migration, err = test.NewMigration(s.DB, "../test/migrations")
 	require.NoError(s.T(), err)
 	_, err = s.Migration.Up()
 	require.NoError(s.T(), err)
@@ -229,6 +188,13 @@ func Close(c io.Closer) {
 	}
 }
 
+func TestRepositorySuite(t *testing.T) {
+	mysuite := &mysqlSuite{
+		DB: db,
+	}
+	suite.Run(t, mysuite)
+}
+
 func TestMain(m *testing.M) {
 	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
 	pool, err := dockertest.NewPool("")
@@ -262,11 +228,4 @@ func TestMain(m *testing.M) {
 	}
 
 	os.Exit(code)
-}
-
-func TestRepositorySuite(t *testing.T) {
-	mysuite := &mysqlSuite{
-		DB: db,
-	}
-	suite.Run(t, mysuite)
 }

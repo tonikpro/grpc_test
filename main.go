@@ -1,8 +1,6 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"net"
@@ -39,14 +37,7 @@ func main() {
 	db.SetMaxOpenConns(10)
 	svc := service.NewService(repository.NewA2billingRepository(db))
 
-	endpoints := service.A2billingEndpoints{
-		GetAgentIdsByParentAgentID: func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			if id, ok := request.(int32); ok {
-				return svc.GetAgentIdsByParentAgentID(ctx, id)
-			}
-			return nil, errors.New("ERR_BADREQUEST")
-		},
-	}
+	endpoints := service.NewA2billingEndpoints(svc)
 	endpoints.GetAgentIdsByParentAgentID = service.LoggingMiddleware(logger)(endpoints.GetAgentIdsByParentAgentID)
 
 	go func() {
