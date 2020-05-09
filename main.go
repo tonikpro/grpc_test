@@ -9,18 +9,20 @@ import (
 	"syscall"
 
 	"github.com/go-kit/kit/log"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/tonikpro/grpc_test/repository"
 	"github.com/tonikpro/grpc_test/service"
 	mygrpc "github.com/tonikpro/grpc_test/transport/grpc"
 	"github.com/tonikpro/grpc_test/transport/grpc/pb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
 	var (
 		mysqlConnectionString = flag.String("mysql.conn", "", "MySQL connection string")
-		tcpPort               = flag.Int("tcp.port", 50000, "TCP port for gRpc connections")
+		tcpPort               = flag.Int("tcp.port", 50051, "TCP port for gRpc connections")
 	)
 
 	flag.Parse()
@@ -48,6 +50,7 @@ func main() {
 		}
 		s := grpc.NewServer()
 		pb.RegisterA2BillingServer(s, mygrpc.NewGrpcServer(endpoints))
+		reflection.Register(s)
 		if err := s.Serve(lis); err != nil {
 			errc <- err
 			return

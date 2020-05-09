@@ -13,9 +13,9 @@ func Test_a2billing_GetAgentIdsByParentAgentID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	m := repository.NewMockA2billingRepository(ctrl)
-	m.EXPECT().GetAgentIdsByParentAgentID(int32(1)).Return([]int32{2, 3, 4}, nil)
-	m.EXPECT().GetAgentIdsByParentAgentID(int32(5)).Return([]int32{6, 7}, nil)
-	m.EXPECT().GetAgentIdsByParentAgentID(int32(6)).Return([]int32{}, nil)
+	m.EXPECT().GetAgentIdsByParentAgentID(context.Background(), int32(1)).Return([]int32{2, 3, 4}, nil)
+	m.EXPECT().GetAgentIdsByParentAgentID(context.Background(), int32(5)).Return([]int32{6, 7}, nil)
+	m.EXPECT().GetAgentIdsByParentAgentID(context.Background(), int32(6)).Return([]int32{}, nil)
 	svc := NewService(m)
 	type args struct {
 		ctx context.Context

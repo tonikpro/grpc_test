@@ -1,12 +1,14 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	driverSql "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -97,8 +99,11 @@ func (s *mysqlSuite) TearDownTest() {
 
 func (s *mysqlSuite) TestGetAgentIdsByParentAgentID() {
 	type args struct {
-		id int32
+		id  int32
+		ctx context.Context
 	}
+	timeout, cancel := context.WithTimeout(context.Background(), time.Millisecond)
+	defer cancel()
 
 	repo := NewA2billingRepository(s.DB)
 	tests := []struct {
@@ -114,6 +119,7 @@ func (s *mysqlSuite) TestGetAgentIdsByParentAgentID() {
 			repo,
 			args{
 				1,
+				context.Background(),
 			},
 			[]int32{5, 6},
 			false,
@@ -123,6 +129,7 @@ func (s *mysqlSuite) TestGetAgentIdsByParentAgentID() {
 			repo,
 			args{
 				2,
+				context.Background(),
 			},
 			[]int32{7, 8},
 			false,
@@ -132,6 +139,7 @@ func (s *mysqlSuite) TestGetAgentIdsByParentAgentID() {
 			repo,
 			args{
 				3,
+				context.Background(),
 			},
 			[]int32{9},
 			false,
@@ -141,6 +149,7 @@ func (s *mysqlSuite) TestGetAgentIdsByParentAgentID() {
 			repo,
 			args{
 				4,
+				context.Background(),
 			},
 			[]int32{10},
 			false,
@@ -150,14 +159,25 @@ func (s *mysqlSuite) TestGetAgentIdsByParentAgentID() {
 			repo,
 			args{
 				5,
+				context.Background(),
 			},
 			[]int32{},
 			false,
 		},
+		{
+			"error",
+			repo,
+			args{
+				5,
+				timeout,
+			},
+			[]int32{},
+			true,
+		},
 	}
 	for _, tt := range tests {
 		s.T().Run(tt.name, func(t *testing.T) {
-			gotResult, err := tt.r.GetAgentIdsByParentAgentID(tt.args.id)
+			gotResult, err := tt.r.GetAgentIdsByParentAgentID(tt.args.ctx, tt.args.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("a2billingRepository.GetAgentIdsByParentAgentID() error = %v, wantErr %v", err, tt.wantErr)
 				return

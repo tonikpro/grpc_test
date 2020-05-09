@@ -1,13 +1,17 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"context"
+
+	"github.com/jmoiron/sqlx"
+)
 
 type a2billingRepository struct {
 	db *sqlx.DB
 }
 
-func (r a2billingRepository) GetAgentIdsByParentAgentID(id int32) (result []int32, err error) {
-	rows, err := r.db.Queryx("SELECT id FROM cc_agent WHERE parent_agent_id = ?", id)
+func (r a2billingRepository) GetAgentIdsByParentAgentID(ctx context.Context, id int32) (result []int32, err error) {
+	rows, err := r.db.QueryxContext(ctx, "SELECT id FROM cc_agent WHERE parent_agent_id = ?", id)
 	if err != nil {
 		return
 	}

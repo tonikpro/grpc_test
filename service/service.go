@@ -11,7 +11,7 @@ type a2billing struct {
 }
 
 func (s a2billing) GetAgentIdsByParentAgentID(ctx context.Context, id int32) (result []int32, err error) {
-	return s.repo.GetAgentIdsByParentAgentID(id)
+	return s.repo.GetAgentIdsByParentAgentID(ctx, id)
 }
 
 func NewService(repo repository.A2billingRepository) A2billing {

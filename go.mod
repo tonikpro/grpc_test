@@ -14,6 +14,6 @@ require (
 	github.com/opencontainers/runc v0.1.1 // indirect
 	github.com/ory/dockertest v3.3.5+incompatible
 	github.com/stretchr/testify v1.5.1
-	google.golang.org/grpc v1.29.1
+	google.golang.org/grpc v1.28.1
 	google.golang.org/protobuf v1.21.0
 )
